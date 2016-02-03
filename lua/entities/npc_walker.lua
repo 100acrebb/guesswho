@@ -12,14 +12,16 @@ function ENT:Initialize()
     local models = GAMEMODE.Models
 
     if SERVER then self:SetWalkerModelIndex( math.random( 1, #models ) ) end
-    
+
     self:SetModel( models[ self:GetWalkerModelIndex() ] )
 
     local walkerColors = GAMEMODE.WalkerColors
 
     if SERVER then self:SetWalkerColorIndex( math.random( 1, #walkerColors ) ) end
 
-    self.GetPlayerColor = function() return walkerColors[ self:GetWalkerColorIndex() ] end
+    self.WalkerColor = Vector( walkerColors[ self:GetWalkerColorIndex() ].r/255, walkerColors[ self:GetWalkerColorIndex() ].g/255, walkerColors[ self:GetWalkerColorIndex() ].b/255 )
+
+    self.GetPlayerColor = function() return self.WalkerColor end
 
     self:SetHealth(100)
 

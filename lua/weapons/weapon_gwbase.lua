@@ -24,11 +24,11 @@ SWEP.Secondary.Ammo         = "ability"
 SWEP.ViewModel = ""
 SWEP.WorldModel = ""
 
-SWEP.Cooldown = 30
+SWEP.HoldType = "normal"
 
 function SWEP:Initialize()
 
-    self:SetHoldType( "normal" )
+    self:SetHoldType( self.HoldType )
 
 end
 
@@ -58,8 +58,13 @@ end
 function SWEP:SecondaryAttack()
     if ( !self:CanSecondaryAttack() ) then return end
 
-    if self.AbilitySound then
-        local abilitySound = Sound( self.AbilitySound )
+    if self.AbilitySound and SERVER then
+        local abilitySound
+        if istable( self.AbilitySound ) then
+            abilitySound = Sound( self.AbilitySound[ math.random( #self.AbilitySound ) ] )
+        else
+            abilitySound = Sound( self.AbilitySound )
+        end
         if abilitySound then
             self.Owner:EmitSound( abilitySound )
         end
