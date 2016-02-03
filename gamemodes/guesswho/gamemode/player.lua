@@ -296,13 +296,13 @@ end
 
 function GM:PlayerCanSeePlayersChat( text, teamonly, listenply, speakply )
 
-    if ( !IsValid( speakply ) or !IsValid( listenply ) ) then return false end
+    --[[if ( !IsValid( speakply ) or !IsValid( listenply ) ) then return false end
 
     if ( teamonly ) then
         if ( listenply:Team() != speakply:Team() ) then return false end
     end
 
-    if listenply:Alive() and !speakply:Alive() then return false end
+    if listenply:Alive() and !speakply:Alive() then return false end]]
 
     return true
 
@@ -342,6 +342,10 @@ function GM:AllowPlayerPickup( ply, ent )
 
     if !ply:Alive() then return false end
 
-    return true
+    return false -- dont let them use props to exploit
 
 end
+
+
+
+
