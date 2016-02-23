@@ -3,7 +3,7 @@ GM.Author = "Lolleko"
 GM.Email = "N/A"
 GM.Website = "https://github.com/lolleko/guesswho"
 
-GM.Version = "1.3.1 (45)" --LastVersion 1.2.4 (44)
+GM.Version = "1.3.1b (47)" --LastVersion 1.3.1 (46)
 
 GM.TeamBased    = true
 
