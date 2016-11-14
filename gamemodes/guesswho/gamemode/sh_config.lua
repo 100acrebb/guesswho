@@ -28,14 +28,17 @@ GM.SeekerModels = {
 
 GM.Weapons = {
     "weapon_gw_prophunt",
-    --"weapon_gw_barricade",
+    "weapon_gw_surge",
     "weapon_gw_shockwave",
     "weapon_gw_cloak",
     --"weapon_gw_smoke",
     "weapon_gw_shrink",
     "weapon_gw_decoy",
     "weapon_gw_sudoku",
-    "weapon_gw_disguise"
+    "weapon_gw_disguise",
+    "weapon_gw_vampirism",
+    "weapon_gw_ragdoll",
+    "weapon_gw_superhot"
 }
 
 GM.TeamSeekingColor = Color(138, 155, 15)

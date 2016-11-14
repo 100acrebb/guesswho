@@ -23,11 +23,18 @@ include( "shared.lua" )
 include( "player.lua" )
 include( "player_ext.lua" )
 include( "round.lua" )
+include( "propfreeze.lua" )
+include( "targetfinder.lua")
 
 --resources
 resource.AddWorkshop( "480998235" )
 
 resource.AddFile( "materials/vgui/gw/logo_main.png" )
+
+local icons = file.Find("materials/vgui/gw/abilityicons/*.png", "GAME")
+for _, icon in pairs(icons) do
+    resource.AddFile( icon )
+end
 
 for _,sound in pairs( file.Find( "sound/gwtaunts/*", "GAME" ) ) do
     resource.AddFile( "sound/gwtaunts/" .. sound )
@@ -44,6 +51,10 @@ util.AddNetworkString( "gwPlayerHull" )
 --[[
     GAMEMODE HOOKS
 ]]--
+
+function GM:Initialize()
+    timer.Create( "gw.player.distance.update.think", 0.1, 0, self.TargetFinderThink)
+end
 
 --Take Damage if innocent NPC damaged
 function GM:EntityTakeDamage(target, dmginfo)

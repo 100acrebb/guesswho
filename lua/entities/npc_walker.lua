@@ -150,7 +150,7 @@ function ENT:OnContact( ent )
         self.loco:Approach( self:GetPos() + Vector( math.Rand( -1, 1 ), math.Rand( -1, 1 ), 0 ) * 2000,1000)
         if math.abs(self:GetPos().z - ent:GetPos().z) > 30 then self:SetSolidMask( MASK_NPCSOLID_BRUSHONLY ) end
     end
-    if  ( ent:GetClass() == "prop_physics_multiplayer" or ent:GetClass() == "prop_physics" ) and ent:IsOnGround() then
+    if  ( ent:GetClass() == "prop_physics_multiplayer" or ent:GetClass() == "prop_physics" ) and ent:IsOnGround() and not GetConvar("gw_propfreeze_enabled"):GetBool() then
         --self.loco:Approach( self:GetPos() + Vector( math.Rand( -1, 1 ), math.Rand( -1, 1 ), 0 ) * 2000,1000)
         local phys = ent:GetPhysicsObject()
         if !IsValid(phys) then return end
@@ -246,11 +246,9 @@ function ENT:Jump(goal, scanDist)
     self:SetLastAct(self:GetActivity())
     self.Jumped = CurTime()
     self.IsJumping = true
-    self:SetSolidMask( MASK_NPCSOLID_BRUSHONLY )
     self.loco:Jump()
     --Boost them
-    self.loco:Approach(goal, 1000)
-
+    timer.Simple( 0.5, function() if IsValid(self) then self.loco:SetVelocity( self:GetForward() * 5 ) end end)
 end
 
 function ENT:Duck( state )

@@ -1,4 +1,10 @@
 CHHUD = {}
+CHHUD.AbilityIcons = {}
+
+local icons = file.Find("materials/vgui/gw/abilityicons/*.png", "GAME")
+for _, icon in pairs(icons) do
+    CHHUD.AbilityIcons[string.StripExtension(icon)] = Material("materials/vgui/gw/abilityicons/" .. icon, "noclamp smooth")
+end
 
 function CHHUD:CreateHead()
     if !self.HeadModel and !IsValid(self.HeadModel) and GetConVar("gw_hud_showhead"):GetInt() == 1 then
@@ -52,6 +58,36 @@ function CHHUD:DrawPanel( x, y, w, h, clrs, brdwidth)
     surface.SetDrawColor( color( clrs.background ) )
     surface.DrawRect( x, y, w, h )
 
+end
+
+function CHHUD:DrawCircle( x, y, radius, seg, clr)
+
+    if radius == 0 then return end
+
+    surface.SetDrawColor( clr )
+
+    local cir = {}
+
+    table.insert( cir, { x = x, y = y, u = 0.5, v = 0.5 } )
+    for i = 0, seg do
+        local a = math.rad( ( i / seg ) * -360 )
+        table.insert( cir, { x = x + math.sin( a ) * radius, y = y + math.cos( a ) * radius, u = math.sin( a ) / 2 + 0.5, v = math.cos( a ) / 2 + 0.5 } )
+    end
+
+    local a = math.rad( 0 ) -- This is need for non absolute segment counts
+    table.insert( cir, { x = x + math.sin( a ) * radius, y = y + math.cos( a ) * radius, u = math.sin( a ) / 2 + 0.5, v = math.cos( a ) / 2 + 0.5 } )
+
+    surface.DrawPoly( cir )
+end
+
+function CHHUD:DrawAbilityIcon(ability, x, y, w, h)
+    if self.AbilityIcons[ability] then
+        w = w or 128
+        h = h or 128
+        surface.SetDrawColor( 255, 255, 255, 255 )
+        surface.SetMaterial( self.AbilityIcons[ability]	)
+        surface.DrawTexturedRect( x, y, w, h )
+    end
 end
 
 function CHHUD:Crosshair()
@@ -140,11 +176,41 @@ function CHuntHUD()
         end
 
         if ply:IsHiding() and ply:GetActiveWeapon():Clip2() > 0 then
-            CHHUD:DrawPanel( ScrW() - 220, ScrH() - 40, 200, 20, {background = teamColor})
-            CHHUD:DrawText( ScrW() - ( 120 + CHHUD:TextSize( ply:GetActiveWeapon().Name, "robot_small" ) / 2 ), ScrH() - 38, ply:GetActiveWeapon().Name, "robot_small", clrs.white )
+            CHHUD:DrawPanel( ScrW() - 148, ScrH() - 40, 128, 20, {background = clrs.darkgreybg})
+            CHHUD:DrawAbilityIcon(ply:GetActiveWeapon():GetClass(), ScrW() - 148, ScrH() - 168)
+            CHHUD:DrawText( ScrW() - ( 84 + CHHUD:TextSize( ply:GetActiveWeapon().Name, "robot_small" ) / 2 ), ScrH() - 38, ply:GetActiveWeapon().Name, "robot_small", clrs.white )
         end
 
     end
+
+    --TargetFinder
+    if ply:Alive() and ply:IsSeeking() and GetConVar("gw_target_finder_enabled"):GetBool() then
+        local distance = ply:GetNWFloat("gwClosestTargetDistance", -1)
+
+        local distanceThreshold = GetConVar( "gw_target_finder_threshold" ):GetInt()
+        local maxRadius = 50
+        local circleRadius
+        if distance == 0 then
+            circleRadius = maxRadius
+        elseif distance == -1 then
+            circleRadius = 0
+        else
+            circleRadius = distanceThreshold / distance * maxRadius
+        end
+        CHHUD:DrawCircle( ScrW() / 2, ScrH() - 75, maxRadius, 32, clrs.darkgreybg )
+        CHHUD:DrawCircle( ScrW() / 2, ScrH() - 75, circleRadius, 32, teamColor )
+
+        local distanceText = "No Target"
+        if distance != -1 then
+            if distance == 0 then
+                distanceText = "Nearby"
+            else
+                distanceText = math.ceil(distance)
+            end
+        end
+        CHHUD:DrawText( ScrW() / 2 - (CHHUD:TextSize( distanceText, "robot_small" ) / 2), ScrH() - 83, distanceText, "robot_small", clrs.white )
+    end
+
 end
 hook.Add( "HUDPaint", "CHuntHUD", CHuntHUD)
 
