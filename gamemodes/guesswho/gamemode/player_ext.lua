@@ -1,8 +1,6 @@
 local plymeta = FindMetaTable( "Player" )
 if ( !plymeta ) then return end
 
-AccessorFunc( plymeta , "bStunned", "Stunned", FORCE_BOOL )
-
 function plymeta:ApplyStun( dur )
 
     local ply = self
@@ -21,28 +19,6 @@ function plymeta:ApplyStun( dur )
 
 end
 
-function plymeta:GetSeekerTouches()
-    return self.iSeekerTouches or 0
-end
-
-function plymeta:SetSeekerTouches(val)
-    self.iSeekerTouches = val
-end
-
-function plymeta:GetLastSeekerTouch()
-    return self.fLastSeekerTouch or 0
-end
-
-function plymeta:AddSeekerTouch()
-    if self:GetLastSeekerTouch() + 2 < CurTime() then
-        self.iSeekerTouches = self:GetSeekerTouches() + 1
-        self.fLastSeekerTouch = CurTime()
-    end
-end
-
-function plymeta:ResetSeekerTouches()
-    self.iSeekerTouches = 0
-    self:StripWeapons()
-
-    self:Give( GAMEMODE.Weapons[ math.random( 1, #GAMEMODE.Weapons ) ] )
+function plymeta:PlaySoundForPlayer(path)
+    self:SendLua("surface.PlaySound('" .. path .. "')")
 end

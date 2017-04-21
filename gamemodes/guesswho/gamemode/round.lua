@@ -39,9 +39,10 @@ function GM:RoundCreateWalkers()
     self:GetSpawnPoints()
 
     local wave = 1
+    local playerCount = #player.GetAll()
 
     self.WalkerCount = 0
-    self.MaxWalkers = self.BaseWalkers + ( #player.GetAll() * self.WalkerPerPly )
+    self.MaxWalkers = self.BaseWalkers + ( playerCount * self.WalkerPerPly )
 
     if #self.SpawnPoints > self.MaxWalkers then
         self:SpawnNPCWave()
@@ -88,6 +89,11 @@ function GM:RoundStart()
         v:Freeze( false )
         v:SetAvoidPlayers( false )
         v:GodDisable()
+    end
+
+    -- EASTER
+    if GetConVar("gw_easter_egg_hunt_enabled"):GetBool() then
+        self:SpawnEasterEggs(#player.GetAll() * 8)
     end
 
     timer.Create( "RoundThink", 1, self.RoundDuration, function() self:RoundThink() end)
@@ -142,11 +148,12 @@ function GM:RoundEnd( caught )
     else
         PrintMessage( HUD_PRINTTALK, "The " .. team.GetName( TEAM_HIDING ) .. " win." )
         for k,v in pairs(team.GetPlayers( TEAM_HIDING )) do
+            v:ConCommand("act cheer")
             if v:Alive() then v:AddFrags( 1 ) end --if still alive as hiding after round give them one point (frag)
         end
         team.AddScore( TEAM_HIDING, 1)
     end
-    timer.Simple(3, function() self:PostRound() end)
+    timer.Simple(5, function() self:PostRound() end)
 end
 
 function GM:PostRound()
@@ -203,6 +210,24 @@ function GM:SpawnNPCWave()
 
     end
 
+end
+
+
+function GM:SpawnEasterEggs(eggCount)
+    local allNavs = navmesh.GetAllNavAreas()
+    for _, nav in RandomPairs(allNavs) do
+        local spots = nav:GetHidingSpots()
+        local spot = table.Random(spots)
+        if spot then
+            local egg = ents.Create("gw_easter_egg")
+            if !IsValid(egg) then break end
+            egg:SetPos(spot)
+            egg:Spawn()
+            egg:Activate()
+            eggCount = eggCount - 1
+        end
+        if eggCount == 0 then return end
+    end
 end
 
 function GM:UpdateSettings()

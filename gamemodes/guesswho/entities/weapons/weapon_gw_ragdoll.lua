@@ -1,4 +1,3 @@
-
 SWEP.Base = "weapon_gwbase"
 SWEP.Name = "Ragdoll"
 
@@ -7,6 +6,10 @@ function SWEP:Ability()
     timer.Create( "Ability.Effect." .. ply:SteamID(), 8, 1, function() self:OnRemove() end )
 
     if SERVER then
+
+        net.Start( "PlayerKilledSelf" )
+            net.WriteEntity( ply )
+        net.Broadcast()
 
         if ply:InVehicle() then
             ply:ExitVehicle()

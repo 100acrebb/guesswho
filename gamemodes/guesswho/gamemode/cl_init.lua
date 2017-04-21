@@ -3,6 +3,7 @@ CreateClientConVar( "gw_hud_showhead", "1", true, false )
 CreateClientConVar( "gw_language", "auto", true, false )
 
 language.Add( "npc_walker", "Walker" )
+language.Add("gw_easter_egg", "Easter Egg")
 
 --Colors + fonts
 surface.CreateFont( "robot_medium",
@@ -112,8 +113,7 @@ function GM:CalcView(ply, pos, angles, fov)
         end
 
     end
-
-    if ply:IsHiding() or ply:IsStunned() then
+    if ply:IsHiding() or ((ply:IsStunned() or ply:IsPlayingTaunt()) and self:GetRoundState() ~= ROUND_HIDE) then
 
         local dist = 100
 

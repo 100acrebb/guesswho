@@ -3,9 +3,9 @@ GM.Author = "Lolleko"
 GM.Email = "N/A"
 GM.Website = "https://github.com/lolleko/guesswho"
 
-GM.Version = "1.5 (51)" --LastVersion 1.4.1a (50)
+GM.Version = "1.6.4a (58)"
 
-GM.TeamBased    = true
+GM.TeamBased = true
 
 DeriveGamemode( "base" )
 
@@ -34,6 +34,10 @@ ROUND_NAV_GEN = 9
 --Shared CVars fallback
 CreateConVar("gw_target_finder_threshold", "700", {FCVAR_REPLICATED, FCVAR_ARCHIVE}, "The distance before the target finder will display nearby")
 CreateConVar("gw_target_finder_enabled", "1", {FCVAR_REPLICATED, FCVAR_ARCHIVE}, "Wether target finder is enabled or not")
+CreateConVar("gw_abilities_enabled", "1", {FCVAR_REPLICATED, FCVAR_ARCHIVE}, "Should hiding have abilities or not.")
+CreateConVar("gw_touches_enabled", "1", {FCVAR_REPLICATED, FCVAR_ARCHIVE}, "Wether touching for weapons is enabled.")
+CreateConVar("gw_touches_required", "3", {FCVAR_REPLICATED, FCVAR_ARCHIVE}, "The amount of seeker touches that are required for a hider to receive a new weapon.")
+
 
 function GM:CreateTeams()
 
@@ -74,7 +78,7 @@ function GM:ShouldCollide( ent1, ent2 )
         return false
     end
 
-    if SERVER and GetConVar( "gw_abilities_enabled" ):GetBool() and GetConVar("gw_touches_enabled"):GetBool() and self:GetRoundState() == ROUND_SEEK then
+    if GetConVar( "gw_abilities_enabled" ):GetBool() and GetConVar("gw_touches_enabled"):GetBool() and self:GetRoundState() == ROUND_SEEK then
         local hider, seeker
         if ent1:IsPlayer() and ent2:IsPlayer() then
             if ent1:IsHiding() and ent2:IsSeeking() then
@@ -87,13 +91,6 @@ function GM:ShouldCollide( ent1, ent2 )
 
             if hider and hider:GetLastSeekerTouch() + 3 < CurTime() and hider:GetPos():Distance(seeker:GetPos()) < 40  then
                 hider:AddSeekerTouch()
-
-                if hider:GetSeekerTouches() >= GetConVar("gw_touches_required"):GetInt() then
-                    hider:ChatPrint("You received a new ability.")
-                    hider:ResetSeekerTouches()
-                else
-                    hider:ChatPrint("Touch " .. GetConVar("gw_touches_required"):GetInt() - hider:GetSeekerTouches() .. " more seekers to recieve a new ability.")
-                end
             end
         end
     end
